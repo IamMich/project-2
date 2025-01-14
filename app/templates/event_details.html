@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ event.name }}</title>
+</head>
+<body>
+    <h1>{{ event.name }}</h1>
+    <p>{{ event.description }}</p>
+    <p>Event Date: {{ event.date }}</p>
+
+    <h2>Attendees</h2>
+    <ul>
+        {% for attendee in attendees %}
+            <li>{{ attendee.name }} ({{ attendee.email }})</li>
+        {% endfor %}
+    </ul>
+
+    <form method="POST">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>
