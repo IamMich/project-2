@@ -1,25 +1,22 @@
-# app/models/models.py
-
+# app/models.py
+from datetime import datetime
 from app import db
 from flask_login import UserMixin
 
-# Define the Event model
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
-    attendees = db.relationship('Attendee', backref='event', lazy=True)
+    description = db.Column(db.String(255), nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-# Define the Attendee model
 class Attendee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-
-# Define the User model
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
+    user = db.relationship('User', backref=db.backref('attendees', lazy=True))
+    event = db.relationship('Event', backref=db.backref('attendees', lazy=True))

@@ -1,39 +1,25 @@
+<!-- app/templates/create_event.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Event - Event Management System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Create Event - Event Management</title>
 </head>
 <body>
-    <div class="container">
-        <div class="row justify-content-center mt-5">
-            <div class="col-md-6">
-                <h2 class="text-center">Create Event</h2>
-                <form method="POST" action="{{ url_for('event.create_event') }}">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Event Name</label>
-                        {{ form.name(class="form-control", id="name", placeholder="Enter event name") }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Event Description</label>
-                        {{ form.description(class="form-control", id="description", placeholder="Enter event description") }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="date" class="form-label">Event Date</label>
-                        {{ form.date(class="form-control", id="date", type="date") }}
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100">Create Event</button>
-                </form>
-            </div>
+    <h2>Create a New Event</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.name.label }}: {{ form.name() }}
         </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <div>
+            {{ form.description.label }}: {{ form.description() }}
+        </div>
+        <div>
+            {{ form.date.label }}: {{ form.date() }}
+        </div>
+        <button type="submit">Create Event</button>
+    </form>
 </body>
 </html>

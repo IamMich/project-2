@@ -11,6 +11,18 @@
         <div class="row justify-content-center mt-5">
             <div class="col-md-6">
                 <h2 class="text-center">Register</h2>
+
+                <!-- Display Flash Message for success or errors -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="alert alert-{{ messages[0][0] }}" role="alert">
+                            {% for category, message in messages %}
+                                <p>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                
                 <form method="POST" action="{{ url_for('auth.register') }}">
                     {{ form.hidden_tag() }}
                     
