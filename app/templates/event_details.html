@@ -4,11 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ event.name }} - Event Details</title>
+
+    <!-- Bootstrap CSS for responsive design -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>{{ event.name }}</h1>
-    <p>{{ event.description }}</p>
-    <p>Event Date: {{ event.date }}</p>
-    <a href="{{ url_for('event_routes.home') }}">Back to Events</a>
+    <div class="container mt-4">
+        <!-- Event Details Header -->
+        <h1>{{ event.name }}</h1>
+        <p class="lead">{{ event.description }}</p>
+        
+        <!-- Event Date -->
+        <p><strong>Event Date:</strong> {{ event.date }}</p>
+
+        <!-- Back Button -->
+        <a href="{{ url_for('event_routes.home') }}" class="btn btn-secondary">Back to Events</a>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js for responsive behavior -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

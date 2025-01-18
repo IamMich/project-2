@@ -1,25 +1,81 @@
-<!-- app/templates/create_event.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Event - Event Management</title>
+
+    <!-- Bootstrap CSS for responsive design -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FullCalendar CSS for calendar view -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.css" rel="stylesheet">
 </head>
 <body>
-    <h2>Create a New Event</h2>
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <div>
-            {{ form.name.label }}: {{ form.name() }}
-        </div>
-        <div>
-            {{ form.description.label }}: {{ form.description() }}
-        </div>
-        <div>
-            {{ form.date.label }}: {{ form.date() }}
-        </div>
-        <button type="submit">Create Event</button>
-    </form>
+    <div class="container mt-4">
+        <h2>Create a New Event</h2>
+        
+        <!-- Event creation form -->
+        <form method="POST" action="{{ url_for('event_routes.confirm_event') }}">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                <label for="name">{{ form.name.label }}:</label>
+                {{ form.name(class="form-control") }}
+            </div>
+
+            <div class="form-group">
+                <label for="description">{{ form.description.label }}:</label>
+                {{ form.description(class="form-control") }}
+            </div>
+
+            <div class="form-group">
+                <label for="date">{{ form.date.label }}:</label>
+                <!-- Use an actual input to select a date -->
+                <input type="text" class="form-control" id="event-date" name="date" readonly>
+            </div>
+
+            <!-- Button to submit and move to confirmation -->
+            <button type="submit" class="btn btn-primary">Create Event</button>
+        </form>
+
+        <h3 class="mt-5">Select Event Date from Calendar</h3>
+
+        <!-- FullCalendar Container for date selection -->
+        <div id="calendar"></div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js for responsive behavior -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- FullCalendar JS for interactive calendar -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'en',
+                dateClick: function(info) {
+                    // Set the selected date in the form input field
+                    var selectedDate = info.dateStr;
+                    document.getElementById("event-date").value = selectedDate;
+                },
+                events: [
+                    {% for event in events %}
+                    {
+                        title: '{{ event.name }}',
+                        start: '{{ event.date }}',  <!-- Ensure event.date is formatted as YYYY-MM-DD -->
+                        description: '{{ event.description }}',
+                    },
+                    {% endfor %}
+                ]
+            });
+            calendar.render();
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Event - Event Management</title>
+
+    <!-- Bootstrap CSS for responsive design -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Confirm Your Event Details</h2>
+
+        <p><strong>Event Name:</strong> {{ event_details.name }}</p>
+        <p><strong>Description:</strong> {{ event_details.description }}</p>
+        <p><strong>Event Date:</strong> {{ event_details.date }}</p>
+
+        <!-- Form to confirm and create the event -->
+        <form method="POST" action="{{ url_for('event_routes.submit_event') }}">
+            <input type="hidden" name="name" value="{{ event_details.name }}">
+            <input type="hidden" name="description" value="{{ event_details.description }}">
+            <input type="hidden" name="date" value="{{ event_details.date }}">
+
+            <button type="submit" class="btn btn-primary">Confirm and Submit Event</button>
+        </form>
+
+        <a href="{{ url_for('event_routes.create_event') }}" class="btn btn-secondary mt-3">Go Back</a>
+    </div>
+
+    <!-- Bootstrap JS for responsive behavior -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
