@@ -3,17 +3,56 @@ from io import StringIO
 from flask import Blueprint, make_response, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app import db
-from app.models import Event, Attendee
+from app.models import Event, Attendee, Venue  # Import the Venue model
 from app.forms.event_form import EventForm
+from app.forms.venue_form import VenueForm  # Importing VenueForm
 from datetime import datetime
 
 bp = Blueprint('event_routes', __name__)
+
+# Venue Management Routes
+
+# Create Venue Route
+@bp.route('/create-venue', methods=['GET', 'POST'])
+@login_required
+def create_venue():
+    form = VenueForm()  # Assuming a VenueForm exists
+    if form.validate_on_submit():
+        new_venue = Venue(
+            name=form.name.data,
+            location=form.location.data,
+            capacity=form.capacity.data
+        )
+        db.session.add(new_venue)
+        db.session.commit()
+        flash('Venue created successfully!', 'success')
+        return redirect(url_for('event_routes.home'))
+    return render_template('create_venue.html', form=form)
+
+# View Venues Route
+@bp.route('/venues', methods=['GET'])
+def view_venues():
+    venues = Venue.query.all()  # Fetch all venues from the database
+    return render_template('view_venues.html', venues=venues)
+
+# View Events Route
+@bp.route('/events', methods=['GET'])
+def view_events():
+    events = Event.query.all()  # Fetch all events from the database
+    return render_template('view_events.html', events=events)  # Render the view_events template
 
 # Home Page (List of Events)
 @bp.route('/')
 def home():
     events = Event.query.all()  # Fetch all events from the database
     return render_template('home.html', events=events)
+
+# Dashboard Route
+@bp.route('/dashboard', methods=['GET'])
+@login_required
+def dashboard():
+    events = Event.query.filter_by(creator_id=current_user.id).all()  # Fetch events created by the current user
+    return render_template('dashboard_updated.html', events=events)  # Render the updated dashboard template with events
 
 # Event Details Page
 @bp.route('/event/<int:event_id>', methods=['GET', 'POST'])
@@ -35,15 +74,41 @@ def event_details(event_id):
 @bp.route('/create-event', methods=['GET', 'POST'])
 @login_required
 def create_event():
-    form = EventForm()
+    form = EventForm()  # Assuming an EventForm exists
     if form.validate_on_submit():
-        # After form submission, redirect to confirm page
-        event_details = {
-            'name': form.name.data,
-            'description': form.description.data,
-            'date': form.date.data
-        }
-        return render_template('confirm_event.html', event_details=event_details)
+        # Check for event date availability
+        existing_event = Event.query.filter_by(date=form.date.data).first()
+        if existing_event:
+            flash('This date is already booked for another event. Please choose a different date.', 'danger')
+            return render_template('create_event.html', form=form)
+
+        # Check for venue availability
+        venue_id = form.venue_id.data  # Assuming the form has a venue_id field
+        venue_events = Event.query.filter_by(venue_id=venue_id, date=form.date.data).first()
+        if venue_events:
+            flash('The selected venue is not available on this date. Please choose a different venue or date.', 'danger')
+            return render_template('create_event.html', form=form)
+
+        new_event = Event(
+            name=form.name.data,
+            description=form.description.data,
+            date=form.date.data,
+            venue_id=venue_id
+        )
+    if form.validate_on_submit():
+        new_event = Event(
+            name=form.name.data,
+            description=form.description.data,
+            date=form.date.data
+        )
+        db.session.add(new_event)
+        try:
+            db.session.commit()
+            flash('Event created successfully!', 'success')  # Success message
+            return redirect(url_for('event_routes.home'))  # Redirect to home after creation
+        except Exception as e:
+            db.session.rollback()
+            flash("An error occurred while creating the event. Please try again.", "danger")
     
     return render_template('create_event.html', form=form)
 
@@ -119,6 +184,28 @@ def export_events():
 # Import events from CSV
 @bp.route('/import-events', methods=['POST'])
 def import_events():
+    file = request.files['file']
+    if file and file.filename.endswith('.csv'):
+        csv_reader = csv.reader(file)
+        for row in csv_reader:
+            if row[0] != 'Event Name':  # Skip header row
+                event = Event(
+                    name=row[0],
+                    description=row[1],
+                    date=datetime.strptime(row[2], '%Y-%m-%d').date()  # Ensure date is correctly formatted
+                )
+                db.session.add(event)
+        db.session.commit()
+        flash('Events imported successfully!', 'success')
+        return redirect(url_for('event_routes.home'))
+    else:
+        flash('Invalid file format. Please upload a CSV file.', 'danger')
+        return redirect(url_for('event_routes.home'))
+
+# Import Events Route
+@bp.route('/import-event', methods=['POST'])
+@login_required
+def import_event():
     file = request.files['file']
     if file and file.filename.endswith('.csv'):
         csv_reader = csv.reader(file)

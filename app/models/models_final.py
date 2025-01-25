@@ -22,12 +22,10 @@ class Event(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(500), nullable=False)
     date = db.Column(db.Date, nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # New field
 
     venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
     venue = db.relationship('Venue', backref=db.backref('events', lazy=True))
-
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    creator = db.relationship('User', backref=db.backref('created_events', lazy=True))
 
     def __repr__(self):
         return f'<Event {self.name}>'

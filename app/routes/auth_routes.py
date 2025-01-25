@@ -24,7 +24,7 @@ def login():
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
             flash('Login Successful', 'success')
-            return redirect(url_for('event_routes.home'))
+            return redirect(url_for('event_routes.dashboard'))  # Redirect to dashboard
         else:
             flash('Login Unsuccessful. Check username and password.', 'danger')
     return render_template('login.html', form=form)
@@ -48,7 +48,7 @@ def register():
 
         login_user(new_user)  # Log the user in
         flash('Registration successful! You are now logged in.', 'success')
-        return redirect(url_for('event_routes.home'))
+        return redirect(url_for('event_routes.dashboard'))  # Redirect to dashboard
     return render_template('register.html', form=form)
 
 # Logout Route
